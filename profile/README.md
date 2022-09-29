@@ -55,7 +55,7 @@ public class MilkModule extends JavaModule {
 	// and other methods
 }
 ```
-## JSON configurations
+## Configurations
 Just a handy utility for JSON configs. For other extensions, you can use the AbstractConfig class
 ```java
 public class MilkConfig extends JsonConfig {
@@ -78,7 +78,7 @@ public class MilkConfig extends JsonConfig {
 	}
 }
 ```
-## Manager classes
+## Managers
 We try to make managers non-static to avoid some problems with modules. Also, our managers themselves call the methods of loading/shipping/saving (with general saving)
 ```java
 public class MilkManager extends AbstractManager {
@@ -125,5 +125,51 @@ public static void runTasks() {
 ```java
 public static void runAsyncTask() {
 	Milkshake.getTaskManager().runAsync(() -> System.out.println("Async runnable"));
+}
+```
+## Menus
+### Menu example
+```java
+public class MilkMenu extends AbstractMenu<String> {
+
+	protected MilkMenu(long userId) {
+		super(userId, List.of("1", "2", "3", "4", "5"), 10); // 10 - values per page
+	}
+
+	@Override
+	public @NotNull MessageCreateData createMessage() {
+		String content;
+		if (this.hasSelectedValues()) {
+			String selected = this.getSelected().get(0);
+			content = "Selected value: " + selected;
+		} else {
+			StringBuilder description = new StringBuilder("values:");
+			for (String value : this.getPageValues()) {
+				description.append("\n- ").append(value);
+			}
+			content = description.toString();
+		}
+		return new MessageCreateBuilder()
+				.setContent(content)
+				.setComponents(this.createActionRows())
+				.build();
+	}
+
+	@Override
+	public @NotNull Collection<ActionRow> createActionRows() { // Select menu maybe?
+		return new ArrayList<>();
+	}
+}
+```
+### Menu listener
+```java
+public class MenuInteractionListener implements Listener {
+
+	@InteractionHandler(id = "open_milk_menu")
+	public void onButtonClicked(@NotNull ButtonInteractionEvent event) {
+		long userId = event.getIdLong();
+		MilkMenu menu = Milkshake.getMenuManager().getOrCreateMenu(userId, MilkMenu.class);
+		event.reply(menu.createMessage()).queue();
+	}
 }
 ```
