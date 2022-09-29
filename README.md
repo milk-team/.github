@@ -100,6 +100,12 @@ public class MilkManager extends AbstractManager {
 	}
 }
 ```
+```java
+public static void main(String[] args) {
+	MilkManager manager = new MilkManager();
+	manager.load(); // Module load
+}
+```
 ## Task and timers
 ```java
 public static void runTasks() {
